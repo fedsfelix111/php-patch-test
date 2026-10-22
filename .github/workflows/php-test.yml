@@ -1,0 +1,32 @@
+name: Test PHP 8.5.12
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository files
+        uses: actions/checkout@v4
+
+      - name: Install latest PHP 8.5 patch
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_sqlite
+          coverage: none
+        env:
+          update: 'true'
+
+      - name: Verify exact PHP version
+        run: |
+          php -v
+          php -r 'if (PHP_VERSION !== "8.5.12") { fwrite(STDERR, "Expected 8.5.12; got " . PHP_VERSION . PHP_EOL); exit(1); }'
+
+      - name: Run PHP test
+        run: php test.php
